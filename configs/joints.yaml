@@ -1,0 +1,60 @@
+"1":
+  offset_angle: 1165
+  odrive_path:
+    - "odrv12"
+    - "axis1"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 71.4285714286
+  cpr: 4096
+"2":
+  offset_angle: 458
+  odrive_path:
+    - "odrv12"
+    - "axis0"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 50
+  cpr: 4096
+"3":
+  offset_angle: 2444
+  odrive_path:
+    - "odrv34"
+    - "axis0"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 150
+  cpr: 4096
+"4":
+  offset_angle: 417
+  odrive_path:
+    - "odrv34"
+    - "axis1"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 64.2857142857
+  cpr: 4096
+"5":
+  offset_angle: 2024
+  odrive_path:
+    - "odrv56"
+    - "axis0"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 85
+  cpr: 4096
+"6":
+  offset_angle: 3014
+  odrive_path:
+    - "odrv56"
+    - "axis1"
+  joint_limits:
+    - 0
+    - 1800
+  gear_ratio: 61
+  cpr: 4096
