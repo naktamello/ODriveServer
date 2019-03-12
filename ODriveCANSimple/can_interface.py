@@ -8,8 +8,6 @@ from ODriveCANSimple.exceptions import *
 PAYLOAD_SIZE = 8
 
 
-
-
 def shift_by_byte(value, bytes_to_shift):
     return (value >> 8 * bytes_to_shift) & 0xFF
 
@@ -39,7 +37,8 @@ SUPPORTED_COMMANDS = [
     ODriveCANCommand('state', enums.MSG_SET_AXIS_REQUESTED_STATE, enums.DataType.INT32)
 ]
 
-def map_data_type_to_serializer(data_type:enums.DataType):
+
+def map_data_type_to_serializer(data_type: enums.DataType):
     if data_type == enums.DataType.INT32 or data_type == enums.DataType.UINT32:
         return 'add_int32'
     if data_type == enums.DataType.INT16:
@@ -48,19 +47,23 @@ def map_data_type_to_serializer(data_type:enums.DataType):
         return 'add_float32'
     assert False
 
-def parse_data_type(value, data_type:enums.DataType):
+
+def parse_data_type(value, data_type: enums.DataType):
     if data_type == enums.DataType.INT32 or data_type == enums.DataType.UINT32 or data_type == enums.DataType.INT16:
         return int(value)
     if data_type == enums.DataType.FLOAT:
         return float(value)
     assert False
 
+
 def find_command_definition(cmd_name):
     names = [cmd.name for cmd in SUPPORTED_COMMANDS]
     idx = names.index(cmd_name)
     return SUPPORTED_COMMANDS[idx]
 
+
 MethodValuePair = namedtuple('MethodValuePair', ['method', 'value'])
+
 
 class ODriveCANInterface:
     def __init__(self):
@@ -79,8 +82,7 @@ class ODriveCANInterface:
             getattr(packet, param.method)(param.value)
         return encode_sCAN(packet)
 
-
-    def parse_params(self, cmd_def:ODriveCANCommand, params)->List[MethodValuePair]:
+    def parse_params(self, cmd_def: ODriveCANCommand, params) -> List[MethodValuePair]:
         if len(params) != len(cmd_def.params):
             raise ODriveCANSignatureMismatch
         payload = []
@@ -89,6 +91,7 @@ class ODriveCANInterface:
             parsed = parse_data_type(param, data_type)
             payload.append(MethodValuePair(method_name, parsed))
         return payload
+
 
 class ODriveCANPacket:
     def __init__(self, node_id, msg_id):
