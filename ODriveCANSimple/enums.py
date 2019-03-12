@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 MSG_CO_NMT_CTRL = 0x000  # CANOpen NMT Message REC
 MSG_CO_HEARTBEAT_CMD = 0x700  # CANOpen NMT Heartbeat SEND
 MSG_ODRIVE_HEARTBEAT = 0x001  # uint32 AxisError, uint32 AxisCurrentState
@@ -24,3 +26,10 @@ MSG_GET_SENSORLESS_ESTIMATES = 0x015  # float32 SensorlessPosEstimate, float32 S
 MSG_RESET_ODRIVE = 0x016
 MSG_GET_VBUS_VOLTAGE = 0x017  # float32 VbusVoltage
 MSG_SET_ENCODER_OFFSET = 0x01F
+
+class DataType(IntEnum):
+    UINT32 = 1
+    INT32 = 2
+    INT16 = 3
+    FLOAT = 4
+
