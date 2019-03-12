@@ -8,7 +8,7 @@ serial = Serial(port="/dev/ttyJ1", baudrate=115200)
 # formula: AMT reading - odrvX.axisX.encoder.offset; (add 4096 if <0)
 # OFFSET = 1165  # JOINT1
 # OFFSET = 458  # JOINT2
-# OFFSET = 2444  # JOINT3
+# OFFSET = 3214  # JOINT3
 # OFFSET = 417  # JOINT4
 # OFFSET = 2024  # JOINT5
 OFFSET = 3014  # JOINT6

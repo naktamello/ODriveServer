@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="647bf408-a148-4f06-b25a-0c3b6443570e" name="Default" comment="" />
+    <list default="true" id="647bf408-a148-4f06-b25a-0c3b6443570e" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/ODriveCANSimple/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ODriveCANSimple/enums.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/joints.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/joints.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/odrive.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/odrive.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/encoder_offset.py" beforeDir="false" afterPath="$PROJECT_DIR$/encoder_offset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/odrive_controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/odrive_controller.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -10,114 +18,98 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/ODriveCtrl$odrive.coverage" NAME="setup_config Coverage Results" MODIFIED="1537769959533" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ODriveCtrl$odrive_controller.coverage" NAME="odrive_controller Coverage Results" MODIFIED="1550644731919" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ODriveCtrl$odrive_controller.coverage" NAME="odrive_controller Coverage Results" MODIFIED="1550821230078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ODriveCtrl$setup_config.coverage" NAME="setup_config Coverage Results" MODIFIED="1538202445687" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ODriveCtrl$encoder_offset.coverage" NAME="encoder_offset Coverage Results" MODIFIED="1549254938704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/ODriveCtrl$mock_can_message.coverage" NAME="mock_can_message Coverage Results" MODIFIED="1550138880670" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6929461">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/setup_config.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="80">
-                  <caret line="5" column="48" lean-forward="true" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/encoder_offset.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="360">
-                  <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
-                  <folding>
-                    <element signature="e#15#28#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file:///usr/local/lib/python3.5/dist-packages/odrive/__init__.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="304">
-                  <caret line="20" selection-start-line="20" selection-end-line="20" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/odrive_controller.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2640">
-                  <caret line="165" column="48" selection-start-line="165" selection-start-column="48" selection-end-line="165" selection-end-column="48" />
-                  <folding>
-                    <element signature="e#0#31#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/mock_can_message.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="32">
-                  <caret line="2" column="4" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="4" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/configs/odrive.yaml">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="48">
-                  <caret line="3" column="31" selection-start-line="3" selection-start-column="31" selection-end-line="3" selection-end-column="31" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/configs/joints.yaml">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="192">
-                  <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file:///media/camel/foolinux_SSD/ansan_honeywell/check_server.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-81">
-                  <folding>
-                    <element signature="e#0#17#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/encoder_offset.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="493">
-                  <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
-                  <folding>
-                    <element signature="e#15#28#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/setup_config.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="80">
+              <caret line="5" column="48" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/encoder_offset.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="32">
+              <caret line="2" column="14" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/lib/python3.5/dist-packages/odrive/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="304">
+              <caret line="20" selection-start-line="20" selection-end-line="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/odrive_controller.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="32">
+              <caret line="2" column="13" lean-forward="true" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mock_can_message.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="64">
+              <caret line="4" column="49" lean-forward="true" selection-start-line="4" selection-start-column="49" selection-end-line="4" selection-end-column="49" />
+              <folding>
+                <element signature="e#0#25#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/configs/odrive.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="96">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/configs/joints.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="336">
+              <caret line="21" column="22" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ODriveCANSimple/enums.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="371">
+              <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/lib/python3.5/dist-packages/odrive/enums.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="208">
+              <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -131,17 +123,28 @@
       <find>self.instance</find>
       <find>receive_signal</find>
       <find>OFFSET</find>
-      <find>offset_angle</find>
       <find>axis0</find>
       <find>odrive</find>
       <find>serial</find>
       <find>axis1</find>
+      <find>valid_amt_angle</find>
+      <find>skip=</find>
+      <find>offset_angle</find>
+      <find>self._joint_names</find>
+      <find>//</find>
+      <find>,</find>
     </findStrings>
     <replaceStrings>
       <replace>serial</replace>
       <replace>axis1</replace>
       <replace>axis0</replace>
+      <replace>absolute_angle</replace>
+      <replace>joint_names</replace>
+      <replace>#</replace>
     </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -150,23 +153,27 @@
         <option value="$PROJECT_DIR$/setup_config.py" />
         <option value="$PROJECT_DIR$/mock_can_message.py" />
         <option value="$PROJECT_DIR$/encoder_offset.py" />
-        <option value="$PROJECT_DIR$/configs/joints.yaml" />
         <option value="$PROJECT_DIR$/configs/odrive.yaml" />
+        <option value="$PROJECT_DIR$/configs/joints.yaml" />
         <option value="$PROJECT_DIR$/odrive_controller.py" />
+        <option value="$PROJECT_DIR$/ODriveCANSimple/CAN_enum.py" />
+        <option value="$PROJECT_DIR$/ODriveCANSimple/enums.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1163" />
+  <component name="ProjectFrameBounds" extendedState="4">
+    <option name="x" value="65" />
     <option name="y" value="24" />
-    <option name="width" value="757" />
+    <option name="width" value="928" />
     <option name="height" value="1056" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -177,13 +184,12 @@
             <path>
               <item name="ODriveCtrl" type="b2602c69:ProjectViewProjectNode" />
               <item name="ODriveCtrl" type="462c0819:PsiDirectoryNode" />
-              <item name="configs" type="462c0819:PsiDirectoryNode" />
+              <item name="ODriveCANSimple" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -212,7 +218,26 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.odrive_controller">
+  <component name="RunManager" selected="Python.CAN_enum">
+    <configuration name="CAN_enum" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ODriveCtrl" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ODriveCANSimple" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ODriveCANSimple/enums.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="encoder_offset" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ODriveCtrl" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -306,14 +331,15 @@
       <item itemvalue="Python.encoder_offset" />
       <item itemvalue="Python.odrive_controller" />
       <item itemvalue="Python.mock_can_message" />
+      <item itemvalue="Python.CAN_enum" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.CAN_enum" />
         <item itemvalue="Python.odrive_controller" />
         <item itemvalue="Python.odrive_controller" />
         <item itemvalue="Python.odrive_controller" />
-        <item itemvalue="Python.encoder_offset" />
-        <item itemvalue="Python.mock_can_message" />
+        <item itemvalue="Python.odrive_controller" />
       </list>
     </recent_temporary>
   </component>
@@ -336,19 +362,30 @@
       <workItem from="1550551587875" duration="2744000" />
       <workItem from="1550624101785" duration="6598000" />
       <workItem from="1550732064375" duration="1535000" />
+      <workItem from="1550820769181" duration="1818000" />
+      <workItem from="1550899457610" duration="1198000" />
+      <workItem from="1550971888554" duration="8502000" />
+      <workItem from="1551491184333" duration="9847000" />
+      <workItem from="1551589464389" duration="5523000" />
+      <workItem from="1551682550840" duration="4647000" />
+      <workItem from="1551754388095" duration="768000" />
+      <workItem from="1551832304401" duration="15000" />
+      <workItem from="1552115080807" duration="421000" />
+      <workItem from="1552263951300" duration="15000" />
+      <workItem from="1552355977684" duration="1495000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="26382000" />
+    <option name="totallyTimeSpent" value="60631000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="65" y="24" width="928" height="1056" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20287451" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4994618" visible="true" weight="0.42063493" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info id="Structure" order="2" side_tool="true" weight="0.22770083" />
+      <window_info id="Structure" order="2" sideWeight="0.50053823" side_tool="true" visible="true" weight="0.42063493" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.38060942" weight="0.2463002" />
       <window_info anchor="bottom" id="Cvs" order="2" weight="0.25" />
@@ -358,13 +395,13 @@
       <window_info anchor="bottom" id="Messages" order="6" />
       <window_info anchor="bottom" id="manage.py@fooldrive" order="7" weight="0.3280757" />
       <window_info anchor="bottom" id="Concurrent Activities Diagram" order="8" weight="0.3922187" />
-      <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" sideWeight="0.48199445" weight="0.33615223" />
-      <window_info anchor="bottom" id="Debug" order="10" sideWeight="0.8299169" weight="0.49426487" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.43601108" weight="0.20959333" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.48199445" weight="0.33615223" />
+      <window_info anchor="bottom" id="Debug" order="10" sideWeight="0.8299169" weight="0.49425286" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.43601108" weight="0.21003135" />
       <window_info anchor="bottom" id="TypeScript" order="12" sideWeight="0.49806094" weight="0.32769555" />
       <window_info anchor="bottom" id="Inspection Results" order="13" weight="0.34566596" />
       <window_info anchor="bottom" id="TODO" order="14" sideWeight="0.48698062" weight="0.43446088" />
-      <window_info anchor="bottom" id="Python Console" order="15" sideWeight="0.45927978" visible="true" weight="0.31282586" />
+      <window_info anchor="bottom" id="Python Console" order="15" sideWeight="0.45927978" visible="true" weight="0.39181915" />
       <window_info anchor="bottom" id="REST Client" order="16" sideWeight="0.4935933" weight="0.36575052" />
       <window_info anchor="bottom" id="Run" order="17" sideWeight="0.5639889" weight="0.4535975" />
       <window_info anchor="bottom" id="Docker" order="18" show_stripe_button="false" />
@@ -377,6 +414,38 @@
       <window_info anchor="right" id="SciView" order="5" />
       <window_info anchor="right" id="PlantUML" order="6" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20508568" />
+      <window_info id="Favorites" order="1" side_tool="true" />
+      <window_info id="Structure" order="2" side_tool="true" weight="0.22770083" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.38060942" weight="0.2463002" />
+      <window_info anchor="bottom" id="Cvs" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="3" weight="0.39957938" />
+      <window_info anchor="bottom" id="Event Log" order="4" sideWeight="0.43601108" side_tool="true" weight="0.35835096" />
+      <window_info anchor="bottom" id="TypeScript Compiler" order="5" sideWeight="0.4936288" visible="true" weight="0.29022083" />
+      <window_info anchor="bottom" id="Messages" order="6" />
+      <window_info anchor="bottom" id="manage.py@fooldrive" order="7" weight="0.3280757" />
+      <window_info anchor="bottom" id="Concurrent Activities Diagram" order="8" weight="0.3922187" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.48199445" weight="0.33615223" />
+      <window_info anchor="bottom" id="Debug" order="10" sideWeight="0.8299169" weight="0.49425286" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.43601108" weight="0.21003135" />
+      <window_info anchor="bottom" id="TypeScript" order="12" sideWeight="0.49806094" weight="0.32769555" />
+      <window_info anchor="bottom" id="Inspection Results" order="13" weight="0.34566596" />
+      <window_info anchor="bottom" id="TODO" order="14" sideWeight="0.48698062" weight="0.43446088" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="15" sideWeight="0.45927978" visible="true" weight="0.3218391" />
+      <window_info anchor="bottom" id="REST Client" order="16" sideWeight="0.4935933" weight="0.36575052" />
+      <window_info anchor="bottom" id="Run" order="17" sideWeight="0.5639889" weight="0.4535975" />
+      <window_info anchor="bottom" id="Docker" order="18" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="19" show_stripe_button="false" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.51412743" />
+      <window_info anchor="right" id="Coverage" order="3" sideWeight="0.5051546" side_tool="true" weight="0.22880886" />
+      <window_info anchor="right" id="Database" order="4" sideWeight="0.49484536" weight="0.27590027" />
+      <window_info anchor="right" id="SciView" order="5" />
+      <window_info anchor="right" id="PlantUML" order="6" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -386,7 +455,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/odrive_controller.py</url>
-          <line>171</line>
+          <line>201</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
@@ -400,10 +469,71 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///media/camel/foolinux_SSD/ansan_honeywell/check_server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup_config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="5" column="48" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/joints.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="18" selection-end-line="21" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/encoder_offset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="14" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file:///usr/local/lib/python3.5/dist-packages/odrive/enums.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
           <caret line="13" column="19" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mock_can_message.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="64">
+          <caret line="4" column="49" lean-forward="true" selection-start-line="4" selection-start-column="49" selection-end-line="4" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/configs/odrive.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/odrive_controller.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="13" lean-forward="true" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -414,60 +544,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/configs/odrive.yaml">
+    <entry file="file://$PROJECT_DIR$/ODriveCANSimple/enums.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="3" column="31" selection-start-line="3" selection-start-column="31" selection-end-line="3" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/configs/joints.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/odrive_controller.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2640">
-          <caret line="165" column="48" selection-start-line="165" selection-start-column="48" selection-end-line="165" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/mock_can_message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="2" column="4" selection-start-line="2" selection-start-column="4" selection-end-line="2" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/encoder_offset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
-          <folding>
-            <element signature="e#15#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup_config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="5" column="48" lean-forward="true" selection-start-line="5" selection-start-column="48" selection-end-line="5" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///media/camel/foolinux_SSD/ansan_honeywell/check_server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-81">
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="371">
+          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
         </state>
       </provider>
     </entry>
