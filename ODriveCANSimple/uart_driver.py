@@ -13,7 +13,6 @@ def process_stdin_data(queue):
     asyncio.async(queue.put(sys.stdin.readline()))
 
 
-
 class AsyncUart(asyncio.Protocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,8 +30,9 @@ class AsyncUart(asyncio.Protocol):
         # print('AsyncUart:', repr(data))
         self.buffer.append(data.decode())
         if b'\r' in data:
-            print("data:", "".join(self.buffer))
-            self.transport.write("".join(self.buffer).encode())
+            print("raw:", "".join(self.buffer))
+            values = self.interface.process_response("".join(self.buffer))
+            print("parsed:", values)
             self.buffer = []
 
     def connection_lost(self, exc: Optional[Exception]):
@@ -51,9 +51,12 @@ class AsyncUart(asyncio.Protocol):
         command_raw = fut.result().strip('\n')
         tokens = command_raw.split(' ')
         print('Received: {!r}'.format(command_raw))
-        packet_ascii = self.interface.process_command(tokens)
-        print('Sending: {!r}'.format(packet_ascii))
-        self.transport.write(packet_ascii.encode())
+        try:
+            packet_ascii = self.interface.process_command(tokens)
+            print('Sending: {!r}'.format(packet_ascii))
+            self.transport.write(packet_ascii.encode())
+        except Exception:
+            print("INVALID")
         fut = asyncio.async(q.get())
         fut.add_done_callback(self.process_user_input)
 
