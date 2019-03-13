@@ -27,9 +27,3 @@ MSG_RESET_ODRIVE = 0x016
 MSG_GET_VBUS_VOLTAGE = 0x017  # float32 VbusVoltage
 MSG_SET_ENCODER_OFFSET = 0x01F
 
-class DataType(IntEnum):
-    UINT32 = 1
-    INT32 = 2
-    INT16 = 3
-    FLOAT = 4
-

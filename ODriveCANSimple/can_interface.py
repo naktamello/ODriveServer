@@ -1,90 +1,40 @@
 import struct
 from collections import namedtuple
-from typing import List
+from typing import List, Tuple
 
 import ODriveCANSimple.enums as enums
+from ODriveCANSimple.data_type import SignedInt32, ODriveCANDataType
 from ODriveCANSimple.exceptions import *
+from ODriveCANSimple.helper import as_ascii
 
 PAYLOAD_SIZE = 8
-
-
-def shift_right(value, bytes_to_shift):
-    return (value >> 8 * bytes_to_shift) & 0xFF
-
-
-def as_ascii(byte):
-    return "{0:0{1}x}".format(byte, 2)
-
-
-def unpack_ieee754_float(val, big_endian=False):
-    endian = '<'
-    if big_endian:
-        endian = '>'
-    return list(struct.pack(endian + 'f', val))
 
 
 class ODriveCANCommand:
     def __init__(self, name, command_code, *params, call_and_response=False):
         self.name = name
         self.command_code = command_code
-        self._params = tuple(params)
+        self._params = tuple(params)  # type: Tuple[ODriveCANDataType]
         self.call_and_response = call_and_response
         # TODO optional params
 
     @property
-    def params(self):
+    def param_defs(self):
         if self.call_and_response:
             return ()
         return self._params
 
+    @property
+    def response_defs(self):
+        return self._params
+
 
 SUPPORTED_COMMANDS = [
-    ODriveCANCommand('setpos', enums.MSG_SET_POS_SETPOINT, enums.DataType.INT32),
-    ODriveCANCommand('encoder', enums.MSG_GET_ENCODER_COUNT, enums.DataType.INT32, enums.DataType.INT32,
+    ODriveCANCommand('setpos', enums.MSG_SET_POS_SETPOINT, SignedInt32),
+    ODriveCANCommand('encoder', enums.MSG_GET_ENCODER_COUNT, SignedInt32, SignedInt32,
                      call_and_response=True),
-    ODriveCANCommand('state', enums.MSG_SET_AXIS_REQUESTED_STATE, enums.DataType.INT32)
+    ODriveCANCommand('state', enums.MSG_SET_AXIS_REQUESTED_STATE, SignedInt32)
 ]
-
-
-def map_data_type_to_serializer(data_type: enums.DataType):
-    if data_type == enums.DataType.INT32 or data_type == enums.DataType.UINT32:
-        return 'add_int32'
-    if data_type == enums.DataType.INT16:
-        return 'add_int16'
-    if data_type == enums.DataType.FLOAT:
-        return 'add_float32'
-    assert False
-
-def map_data_type_to_deserializer(data_type: enums.DataType):
-    if data_type == enums.DataType.INT32:
-        return 'deserialize_int32'
-    if data_type == enums.DataType.UINT32:
-        return 'deserialize_uint32'
-    if data_type == enums.DataType.INT16:
-        return 'deserialize_int16'
-    if data_type == enums.DataType.FLOAT:
-        return 'deserialize_float32'
-    assert False
-
-def deserialize_int32(payload):
-    value = struct.unpack('<i', bytearray(payload[:4]))[0]
-    return value, payload[4:]
-
-def deserialize_uint32(payload):
-    assert False
-
-def deserialize_int16(payload):
-    assert False
-
-def deserialize_float32(payload):
-    assert False
-
-def parse_data_type(value, data_type: enums.DataType):
-    if data_type == enums.DataType.INT32 or data_type == enums.DataType.UINT32 or data_type == enums.DataType.INT16:
-        return int(value)
-    if data_type == enums.DataType.FLOAT:
-        return float(value)
-    assert False
 
 
 def find_command_definition_by_name(cmd_name):
@@ -108,26 +58,21 @@ class ODriveCANInterface:
 
     def process_command(self, command_tokens):
         node_id = int(command_tokens[0])
+        cmd_name = command_tokens[1]
+        cmd_params = command_tokens[2:]
         if node_id > 0x3f:
             raise ODriveCANInvalidNodeID
         if command_tokens[1] not in self.known_commands:
             raise ODriveCANUnsupportedCommand
-        cmd_def = find_command_definition_by_name(command_tokens[1])
-        payload = self.parse_params(cmd_def, command_tokens[2:])
+        cmd_def = find_command_definition_by_name(cmd_name)
         packet = ODriveCANPacket(node_id, cmd_def.command_code)
-        for param in payload:
-            getattr(packet, param.method)(param.value)
+        params = []
+        for param_def, param_str in zip(cmd_def.param_defs, cmd_params):  # type: ODriveCANDataType.__class__, str
+            p = param_def(param_str)  # type: ODriveCANDataType
+            params.append(p)
+        for param in params:
+            packet.add_payload(param)
         return encode_sCAN(packet)
-
-    def parse_params(self, cmd_def: ODriveCANCommand, params) -> List[MethodValuePair]:
-        if len(params) != len(cmd_def.params):
-            raise ODriveCANSignatureMismatch
-        payload = []
-        for param, data_type in zip(params, cmd_def.params):
-            method_name = map_data_type_to_serializer(data_type)
-            parsed = parse_data_type(param, data_type)
-            payload.append(MethodValuePair(method_name, parsed))
-        return payload
 
     def process_response(self, response_string):
         node_id, cmd_code, payload = decode_sCAN(response_string)
@@ -137,11 +82,12 @@ class ODriveCANInterface:
 
     def parse_response(self, cmd_def: ODriveCANCommand, payload: List[int]):
         values = []
-        for data_type in cmd_def._params:
-            function_name = map_data_type_to_deserializer(data_type)
-            value, payload = globals()[function_name](payload)
+        for data_type in cmd_def.response_defs:
+            value = data_type.unpack(payload[:data_type.bits])
+            payload = payload[data_type.bits:]
             values.append(value)
         return values
+
 
 class ODriveCANPacket:
     def __init__(self, node_id, msg_id):
@@ -150,27 +96,12 @@ class ODriveCANPacket:
         self.payload = [0x00] * 8
         self.msg_ptr = 0
 
-    def add_int32(self, val):
+    def add_payload(self, data: ODriveCANDataType):
         self.check_payload_size()
         ptr = self.msg_ptr
-        for i in range(4):
-            self.payload[ptr + i] = shift_right(val, i)
-        self.msg_ptr += 4
-
-    def add_int16(self, val):
-        self.check_payload_size()
-        ptr = self.msg_ptr
-        for i in range(2):
-            self.payload[ptr + i] = shift_right(val, i)
-        self.msg_ptr += 2
-
-    def add_float32(self, val):
-        byte_list = unpack_ieee754_float(val)
-        self.check_payload_size()
-        ptr = self.msg_ptr
-        for i, b in enumerate(byte_list):
-            self.payload[ptr + i] = b
-        self.msg_ptr += 4
+        for i, datum in enumerate(data.pack()):
+            self.payload[ptr + i] = datum
+        self.msg_ptr += data.bits
 
     def check_payload_size(self):
         if self.msg_ptr >= PAYLOAD_SIZE:
@@ -218,9 +149,4 @@ def encode_sCAN(pkt: ODriveCANPacket):
 
 
 if __name__ == '__main__':
-    packet = ODriveCANPacket(0x03, 0x1f)
-    packet.add_int16(30000)
-    packet.add_float32(1.11)
-    packet_string = encode_sCAN(packet)
-    node_id, cmd_id, payload = decode_sCAN(packet_string)
-    print(hex(node_id), hex(cmd_id), [hex(p) for p in payload])
+    pass
