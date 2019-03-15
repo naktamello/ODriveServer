@@ -107,3 +107,7 @@ venv.bak/
 
 .idea
 asyncio_example.py
+scripts/
+/migrate_config/in/*
+/migrate_config/out/*
+/migrate_config/*.json

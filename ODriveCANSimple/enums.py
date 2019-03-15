@@ -25,5 +25,7 @@ MSG_GET_IQ = 0x014  # float32 IqSetpoint, float32 IqMeasured
 MSG_GET_SENSORLESS_ESTIMATES = 0x015  # float32 SensorlessPosEstimate, float32 SensorlessVelEstiamte
 MSG_RESET_ODRIVE = 0x016
 MSG_GET_VBUS_VOLTAGE = 0x017  # float32 VbusVoltage
+MSG_GET_ODRIVE_HEARTBEAT = 0x01D
+MSG_GET_ENCODER_OFFSET = 0x01E
 MSG_SET_ENCODER_OFFSET = 0x01F
 

@@ -10,8 +10,6 @@ from serial import Serial
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 uart = Serial(port="/dev/ttyJ1", baudrate=115200)
 
-OFFSET = 417  # JOINT4
-
 
 def offset_angle(raw_angle, absolute_angle):
     offset = absolute_angle - raw_angle
@@ -59,16 +57,16 @@ def parse_message(msg):
     try:
         name, angles = msg.strip().split(":")
         angle1, angle2 = angles.split("/")
-        # return dict(id=int(tokens[0]), angle=int(tokens[1]))
         return name, int(angle1), int(angle2)
     except Exception:
         return None, None, None
 
 
 class CanBus:
-    def __init__(self):
+    def __init__(self, skip=None):
         self.serial = Serial(port="/dev/ttyJ1", baudrate=115200)
-        self.joint_names = ('j1', 'j2', 'j3', 'j4', 'j5', 'j6')
+        joint_names = ['j1', 'j2', 'j3', 'j4', 'j5', 'j6']
+        self.joint_names = ([name for name in joint_names if name not in skip])
         self.joint_values = dict()
 
     def populate_joint_angles(self):
@@ -108,7 +106,8 @@ class Joint:
     def __init__(self, joint_name, joint_config):
         self.joint_name = joint_name
         self.joint_number = int(joint_name)
-        self.odrv = get_odrv(joint_config['odrive_path'][0])
+        # self.odrv = get_odrv(joint_config['odrive_path'][0])
+        self.odrv = None
         self.axis_name = joint_config['odrive_path'][1]
         self.config = joint_config
         self.initialized = False
@@ -170,9 +169,8 @@ def initialize_joints(skip=None):
     with open(os.path.join(cur_dir, 'configs', 'joints.yaml'), encoding='utf-8') as infile:
         joint_configs = yaml.safe_load(infile)
     for joint_name, config in joint_configs.items():
-        if skip and joint_name in skip:
+        if skip and "j"+joint_name in skip:
             continue
-        print(joint_name)
         joints.append(Joint(joint_name, config))
     joints = sorted(joints, key=attrgetter('joint_number'))
 
@@ -184,41 +182,42 @@ def initialize_joints(skip=None):
 # odrv12 = ODrive(name=odrive_config['odrv12']['name'], serial_number=odrive_config['odrv12']['serial_number'])
 # joint1 = Joint(1, odrv12)
 
-initialize_odrives()
+# initialize_odrives()
+skip = ['j2', 'j3', 'j4', 'j5', 'j6']
 
-can_bus = CanBus()
+can_bus = CanBus(skip=skip)
 can_bus.populate_joint_angles()
+# j1, j2, j3, j4, j5, j6 = initialize_joints()
+j1, = initialize_joints(skip=skip)
 
-j1, j2, j3, j4, j5, j6 = initialize_joints()
+# for joint_name in can_bus.joint_names:
+#     globals()[joint_name].initialize(can_bus.get_motor_absolute_position(joint_name))
+#
+# def energize_all():
+#     for joint_name in can_bus.joint_names:
+#         globals()[joint_name].energize()
+#
+# def deenergize_all():
+#     for joint_name in can_bus.joint_names:
+#         globals()[joint_name].deenergize()
+#
+# def move_p1():
+#     j1.move_to(20000)
+#     j2.move_to(15000)
+#     j3.move_to(-30000)
+#     j4.move_to(10000)
+#     j5.move_to(-20000)
+#     j6.move_to(50000)
+#
+# def move_p0():
+#     j1.move_to(0)
+#     j2.move_to(0)
+#     j3.move_to(0)
+#     j4.move_to(0)
+#     j5.move_to(0)
+#     j6.move_to(0)
 
-for joint_name in can_bus.joint_names:
-    globals()[joint_name].initialize(can_bus.get_motor_absolute_position(joint_name))
-
-def energize_all():
-    for joint_name in can_bus.joint_names:
-        globals()[joint_name].energize()
-
-def deenergize_all():
-    for joint_name in can_bus.joint_names:
-        globals()[joint_name].deenergize()
-
-def move_p1():
-    j1.move_to(20000)
-    j2.move_to(15000)
-    j3.move_to(-30000)
-    j4.move_to(10000)
-    j5.move_to(-20000)
-    j6.move_to(50000)
-
-def move_p0():
-    j1.move_to(0)
-    j2.move_to(0)
-    j3.move_to(0)
-    j4.move_to(0)
-    j5.move_to(0)
-    j6.move_to(0)
-
-print(j1, j2, j3, j4, j5, j6)
+# print(j1, j2, j3, j4, j5, j6)
 # angle = offset_angle(can_bus.joint_values['j4']['amt'], OFFSET)
 
 # if __name__ == '__main__':

@@ -3,7 +3,7 @@ from collections import namedtuple
 from typing import List, Tuple
 
 import ODriveCANSimple.enums as enums
-from ODriveCANSimple.data_type import SignedInt32, ODriveCANDataType
+from ODriveCANSimple.data_type import SignedInt32, ODriveCANDataType, UnsignedInt32
 from ODriveCANSimple.exceptions import *
 from ODriveCANSimple.helper import as_ascii
 
@@ -11,11 +11,12 @@ PAYLOAD_SIZE = 8
 
 
 class ODriveCANCommand:
-    def __init__(self, name, command_code, *params, call_and_response=False):
+    def __init__(self, name, command_code, *params, call_and_response=False, response_code=None):
         self.name = name
         self.command_code = command_code
         self._params = tuple(params)  # type: Tuple[ODriveCANDataType]
         self.call_and_response = call_and_response
+        self.response_code = response_code
         # TODO optional params
 
     @property
@@ -33,7 +34,12 @@ SUPPORTED_COMMANDS = [
     ODriveCANCommand('setpos', enums.MSG_SET_POS_SETPOINT, SignedInt32),
     ODriveCANCommand('encoder', enums.MSG_GET_ENCODER_COUNT, SignedInt32, SignedInt32,
                      call_and_response=True),
-    ODriveCANCommand('state', enums.MSG_SET_AXIS_REQUESTED_STATE, SignedInt32)
+    ODriveCANCommand('state', enums.MSG_SET_AXIS_REQUESTED_STATE, SignedInt32),
+    ODriveCANCommand('roffset', enums.MSG_GET_ENCODER_OFFSET, SignedInt32, SignedInt32,
+                     call_and_response=True),
+    ODriveCANCommand('woffset', enums.MSG_SET_ENCODER_OFFSET, SignedInt32),
+    ODriveCANCommand('heartbeat', enums.MSG_GET_ODRIVE_HEARTBEAT, UnsignedInt32, UnsignedInt32,
+                     call_and_response=True, response_code=enums.MSG_ODRIVE_HEARTBEAT)
 ]
 
 
@@ -44,8 +50,12 @@ def find_command_definition_by_name(cmd_name):
 
 
 def find_command_definition_by_code(cmd_code):
-    codes = [cmd.command_code for cmd in SUPPORTED_COMMANDS]
-    idx = codes.index(cmd_code)
+    try:
+        codes = [cmd.command_code for cmd in SUPPORTED_COMMANDS]
+        idx = codes.index(cmd_code)
+    except ValueError:
+        codes = [cmd.response_code for cmd in SUPPORTED_COMMANDS]
+        idx = codes.index(cmd_code)
     return SUPPORTED_COMMANDS[idx]
 
 
