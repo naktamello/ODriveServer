@@ -1,5 +1,5 @@
 from asyncio import Future
-from typing import Optional
+from typing import Optional, Tuple, Union
 import sys
 from serial import Serial
 import asyncio
@@ -67,7 +67,33 @@ class IOServer(asyncio.Protocol):
 
 
 class AMTUartServer(asyncio.Protocol):
-    pass  # TODO
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.buffer = []
+
+    def connection_made(self, transport: serial_asyncio.SerialTransport):
+        self.transport = transport
+        print('CANUartServer serial port opened')
+        self.transport.serial.rts = False
+
+    def connection_lost(self, exc: Optional[Exception]):
+        print('port closed')
+        self.transport.loop.stop()
+
+    def data_received(self, data: bytes):
+        self.buffer.append(data.decode())
+        if b'\n' in data:
+            print("AMTUartServer raw:", "".join(self.buffer).strip('\n'))
+            self.buffer = []
+
+    @staticmethod
+    def parse_message(msg) -> Union[Tuple[str, int, int], Tuple[None, None, None]]:
+        try:
+            name, angles = msg.strip().split(":")
+            angle1, angle2 = angles.split("/")
+            return name, int(angle1), int(angle2)
+        except Exception:
+            return None, None, None
 
 
 class CANUartServer(asyncio.Protocol):
@@ -78,33 +104,24 @@ class CANUartServer(asyncio.Protocol):
 
     def connection_made(self, transport: serial_asyncio.SerialTransport):
         self.transport = transport
-        print('port opened', transport)
+        print('CANUartServer serial port opened')
         self.transport.serial.rts = False
         fut = asyncio.ensure_future(cmd_queue.get())
         fut.add_done_callback(self.process_user_input)
-
-    def data_received(self, data: bytes):
-        # print('CANUartServer:', repr(data))
-        self.buffer.append(data.decode())
-        if b'\r' in data:
-            print("raw:", "".join(self.buffer))
-            values = self.interface.process_response("".join(self.buffer))
-            asyncio.ensure_future(tcp_queue.put(str(values)))
-            self.transport.write(str(values).encode())
-            print("parsed:", values)
-            self.buffer = []
 
     def connection_lost(self, exc: Optional[Exception]):
         print('port closed')
         self.transport.loop.stop()
 
-    def pause_writing(self):
-        print('pause writing')
-        print(self.transport.get_write_buffer_size())
-
-    def resume_writing(self):
-        print(self.transport.get_write_buffer_size())
-        print('resume writing')
+    def data_received(self, data: bytes):
+        self.buffer.append(data.decode())
+        if b'\r' in data:
+            print("CANUartServer raw:", "".join(self.buffer))
+            values = self.interface.process_response("".join(self.buffer))
+            asyncio.ensure_future(tcp_queue.put(str(values)))
+            self.transport.write(str(values).encode())
+            print("parsed:", values)
+            self.buffer = []
 
     def process_user_input(self, fut):
         command_raw = fut.result().strip('\n')
@@ -125,8 +142,10 @@ if __name__ == '__main__':
     loop.add_reader(sys.stdin, process_stdin_data, cmd_queue)
     coroutine0 = serial_asyncio.create_serial_connection(loop, CANUartServer, '/dev/tty232-0', 115200)
     loop.run_until_complete(coroutine0)
-    coroutine1 = loop.create_server(IOServer, '127.0.0.1', 1978)
-    server = loop.run_until_complete(coroutine1)
+    coroutine1 = serial_asyncio.create_serial_connection(loop, AMTUartServer, '/dev/ttyJ2', 115200)
+    loop.run_until_complete(coroutine1)
+    coroutine2 = loop.create_server(IOServer, '127.0.0.1', 1978)
+    server = loop.run_until_complete(coroutine2)
     try:
         loop.run_forever()
     except KeyboardInterrupt:
