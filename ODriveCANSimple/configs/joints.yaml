@@ -1,66 +1,67 @@
-"1":
-  absolute_angle: 1165
-  odrive_path:
-    - "odrv12"
-    - "axis1"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 71.4285714286
-  cpr: 4096
-  can_node_id: 1
-"2":
-  absolute_angle: 458
-  odrive_path:
-    - "odrv12"
-    - "axis0"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 50
-  cpr: 4096
-  can_node_id: 2
-"3":
-  absolute_angle: 2947
-  odrive_path:
-    - "odrv34"
-    - "axis0"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 150
-  cpr: 4096
-  can_node_id: 3
-"4":
-  absolute_angle: 417
-  odrive_path:
-    - "odrv34"
-    - "axis1"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 64.2857142857
-  cpr: 4096
-  can_node_id: 4
-"5":
-  absolute_angle: 2024
-  odrive_path:
-    - "odrv56"
-    - "axis0"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 85
-  cpr: 4096
-  can_node_id: 5
-"6":
-  absolute_angle: 3014
-  odrive_path:
-    - "odrv56"
-    - "axis1"
-  joint_limits:
-    - 0
-    - 1800
-  gear_ratio: 61
-  cpr: 4096
-  can_node_id: 6
+joints:
+  - name: '1'
+    absolute_angle: 1165
+    odrive_path:
+      - "odrv12"
+      - "axis1"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 71.4285714286
+    cpr: 4096
+    can_node_id: 1
+  - name: '2'
+    absolute_angle: 458
+    odrive_path:
+      - "odrv12"
+      - "axis0"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 50
+    cpr: 4096
+    can_node_id: 2
+  - name: '3'
+    absolute_angle: 2947
+    odrive_path:
+      - "odrv34"
+      - "axis0"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 150
+    cpr: 4096
+    can_node_id: 3
+  - name: '4'
+    absolute_angle: 417
+    odrive_path:
+      - "odrv34"
+      - "axis1"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 64.2857142857
+    cpr: 4096
+    can_node_id: 4
+  - name: '5'
+    absolute_angle: 2024
+    odrive_path:
+      - "odrv56"
+      - "axis0"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 85
+    cpr: 4096
+    can_node_id: 5
+  - name: '6'
+    absolute_angle: 3014
+    odrive_path:
+      - "odrv56"
+      - "axis1"
+    joint_limits:
+      - 0
+      - 1800
+    gear_ratio: 61
+    cpr: 4096
+    can_node_id: 6
