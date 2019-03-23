@@ -10,3 +10,6 @@ class ODriveCANPacketException(Exception):
 
 class ODriveCANSignatureMismatch(Exception):
     pass
+
+class UartServerException(Exception):
+    pass

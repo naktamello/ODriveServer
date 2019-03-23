@@ -3,7 +3,7 @@ from collections import namedtuple
 from typing import List, Tuple
 
 import ODriveCANSimple.enums as enums
-from ODriveCANSimple.data_type import SignedInt32, ODriveCANDataType, UnsignedInt32
+from ODriveCANSimple.data_type import SignedInt32, ODriveCANDataType, UnsignedInt32, FloatIEEE754
 from ODriveCANSimple.exceptions import *
 from ODriveCANSimple.helper import as_ascii
 
@@ -39,7 +39,8 @@ SUPPORTED_COMMANDS = [
                      call_and_response=True),
     ODriveCANCommand('woffset', enums.MSG_SET_ENCODER_OFFSET, SignedInt32),
     ODriveCANCommand('heartbeat', enums.MSG_GET_ODRIVE_HEARTBEAT, UnsignedInt32, UnsignedInt32,
-                     call_and_response=True, response_code=enums.MSG_ODRIVE_HEARTBEAT)
+                     call_and_response=True, response_code=enums.MSG_ODRIVE_HEARTBEAT),
+    ODriveCANCommand('settrajacc', enums.MSG_SET_TRAJ_ACCEL_LIMITS, FloatIEEE754, FloatIEEE754)
 ]
 
 
@@ -84,11 +85,11 @@ class ODriveCANInterface:
             packet.add_payload(param)
         return encode_sCAN(packet)
 
-    def process_response(self, response_string):
+    def process_response(self, response_string)-> Tuple[int, int, List[any]]:
         node_id, cmd_code, payload = decode_sCAN(response_string)
         cmd_def = find_command_definition_by_code(cmd_code)  # type: ODriveCANCommand
         assert cmd_def.call_and_response
-        return self.parse_response(cmd_def, payload)
+        return node_id, cmd_code, self.parse_response(cmd_def, payload)
 
     def parse_response(self, cmd_def: ODriveCANCommand, payload: List[int]):
         values = []
@@ -140,7 +141,7 @@ DECODE_DELIMITER = [0, 1, 4, 5, 7, 9, 11, 13, 15, 17, 19, 21]
 
 def decode_sCAN(message: str):
     if not message.startswith('t'):
-        return None
+        return
     _, cmd_id_hex, length, *payload_hex = [message[i:j] for i, j in zip(DECODE_DELIMITER, DECODE_DELIMITER[1:])]
     payload = [int(item, 16) for item in payload_hex]
     cmd_id_int = int(cmd_id_hex, 16)

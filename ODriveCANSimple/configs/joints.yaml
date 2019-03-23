@@ -4,64 +4,82 @@ joints:
     odrive_path:
       - "odrv12"
       - "axis1"
+    direction: -1
+    joint_zero: 2571
     joint_limits:
-      - 0
-      - 1800
+      - -900
+      - 900
     gear_ratio: 71.4285714286
     cpr: 4096
     can_node_id: 1
+    has_output_encoder: 1
   - name: '2'
     absolute_angle: 458
     odrive_path:
       - "odrv12"
       - "axis0"
+    direction: 1
+    joint_zero: 3518
     joint_limits:
-      - 0
-      - 1800
-    gear_ratio: 50
+      - -700
+      - 900
+    gear_ratio: 50.0
     cpr: 4096
     can_node_id: 2
+    has_output_encoder: 1
   - name: '3'
     absolute_angle: 2947
     odrive_path:
       - "odrv34"
       - "axis0"
+    direction: -1
+    joint_zero: 706
     joint_limits:
-      - 0
-      - 1800
-    gear_ratio: 150
+      - -900
+      - 550
+    gear_ratio: 150.0
     cpr: 4096
     can_node_id: 3
+    has_output_encoder: 1
   - name: '4'
     absolute_angle: 417
     odrive_path:
       - "odrv34"
       - "axis1"
+    direction: 1
+    joint_zero: 121
     joint_limits:
-      - 0
-      - 1800
+      - -700
+      - 700
     gear_ratio: 64.2857142857
     cpr: 4096
     can_node_id: 4
+    has_output_encoder: 1
   - name: '5'
     absolute_angle: 2024
     odrive_path:
       - "odrv56"
       - "axis0"
+    direction: 1
+    joint_zero: 2168
     joint_limits:
-      - 0
-      - 1800
-    gear_ratio: 85
+      - -900
+      - 400
+    gear_ratio: 85.0
     cpr: 4096
     can_node_id: 5
+    has_output_encoder: 1
   - name: '6'
     absolute_angle: 3014
     odrive_path:
       - "odrv56"
       - "axis1"
+    direction: 1
+    joint_zero: 0
     joint_limits:
-      - 0
+      - -1799
       - 1800
-    gear_ratio: 61
+    gear_ratio: 61.0
     cpr: 4096
     can_node_id: 6
+    has_output_encoder: 0
