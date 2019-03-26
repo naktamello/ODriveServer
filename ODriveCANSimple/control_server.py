@@ -12,11 +12,12 @@ from ODriveCANSimple.helper import valid_amt_angle
 from ODriveCANSimple.robot import RoboticArm, Joint
 
 robotic_arm = RoboticArm()
-cmd_queue = asyncio.Queue(maxsize=10)
-tcp_queue = asyncio.Queue(maxsize=10)
+cmd_queue = asyncio.Queue(maxsize=32)
+tcp_queue = asyncio.Queue(maxsize=32)
 rsp_queue = asyncio.Queue(maxsize=32)
 
-critical = []
+critical = []  # TODO timeout invalidation
+
 
 @dataclass
 class ResponseFilter:
@@ -45,26 +46,24 @@ class InitializeJoint:
         self.step_idx = 0
         self.steps = 2  # TODO count method names starting with step by introspection
 
-    def step0(self, *args):
+    async def step0(self, *args):
         critical.append(True)
+        self.joint.reset_state()
         if self.joint.error > 0:
-            asyncio.ensure_future(tcp_queue.put(f"{self.joint.verbose_name} has error"))
+            await tcp_queue.put(f"{self.joint.verbose_name} has error")
             return
         if not valid_amt_angle(self.joint.motor_angle):
-            asyncio.ensure_future(tcp_queue.put("invalid amt angle"))
+            await tcp_queue.put("invalid amt angle")
             return
         self.joint.calculate_offset()
         offset = self.joint.offset.setpoint
         can_node_id = self.joint.config.can_node_id
-        asyncio.ensure_future(cmd_queue.put(f"{can_node_id} woffset {offset}"))
+        await cmd_queue.put(f"{can_node_id} woffset {offset}")
         response_filters.append(ResponseFilter(can_node_id, enums.MSG_GET_ENCODER_OFFSET, self))
-        # sleep(0.5)
-        asyncio.ensure_future(cmd_queue.put(f"{can_node_id} roffset"))
-        asyncio.ensure_future(asyncio.sleep(0.2))
+        await cmd_queue.put(f"{can_node_id} roffset")
 
-    def step1(self, *args):
+    async def step1(self, *args):
         can_node_id = self.joint.config.can_node_id
-        asyncio.ensure_future(cmd_queue.put(f"{can_node_id} encoder"))
         can_response, *_ = args
         print('on step 1', can_response)
         if len(critical):
@@ -73,7 +72,7 @@ class InitializeJoint:
     async def __call__(self, can_response=None):
         method = getattr(self, f"step{self.step_idx}")
         self.step_idx += 1
-        method(can_response)
+        await method(can_response)
 
     def __repr__(self):
         return f"{self.__class__.__name__}:step{self.step_idx}"
@@ -93,7 +92,7 @@ class RobotAPI:
     async def get_zero(self, *args):
         joint_name, = args
         joint = robotic_arm.joint(joint_name)
-        await asyncio.ensure_future(tcp_queue.put(str(joint.get_zero_position())+"\n"))
+        await asyncio.ensure_future(tcp_queue.put(str(joint.get_zero_position()) + "\n"))
 
     async def init_joint(self, *args):
         joint_name, = args
@@ -106,6 +105,7 @@ class RobotAPI:
         joint = robotic_arm.joint(joint_name)
         target = joint.get_target_position(int(angle))
         await asyncio.ensure_future(tcp_queue.put(str(target) + "\n"))
+
 
 robot_api = RobotAPI()
 
@@ -122,7 +122,7 @@ def update_encoder_count(response: CANResponse):
     shadow, cpr = response.data
     joint.cpr = cpr
     joint.shadow_count = shadow
-    print('updated encoder count', joint.__dict__)
+    print('updated encoder count', str(joint))
 
 
 def update_encoder_offset(response: CANResponse):
@@ -130,7 +130,7 @@ def update_encoder_offset(response: CANResponse):
     offset, is_ready = response.data
     joint.encoder_is_ready.actual = is_ready
     joint.offset.actual = offset
-    print('updated encoder offset', joint.__dict__)
+    print('updated encoder offset', str(joint))
 
 
 def process_stdin_data(queue):
@@ -144,6 +144,8 @@ async def get_heartbeat():
             await asyncio.sleep(0.5)
         else:
             for joint in robotic_arm.joints:
+                if len(critical) > 0:
+                    continue
                 command = "{} heartbeat".format(joint.config.can_node_id)
                 await asyncio.ensure_future(cmd_queue.put(command))
                 await asyncio.sleep(0.1)
@@ -293,11 +295,11 @@ class CANUartServer(asyncio.Protocol):
                 node_id, cmd_id, values = self.interface.process_response(to_process)
                 asyncio.ensure_future(rsp_queue.put(CANResponse(node_id, cmd_id, values)))
                 if cmd_id != enums.MSG_ODRIVE_HEARTBEAT:
-                    asyncio.ensure_future(tcp_queue.put(str(values)+"\n"))
+                    asyncio.ensure_future(tcp_queue.put(str(values) + "\n"))
                     print("CANUartServer raw:", to_process)
                     print("parsed: node={}, cmd_id={}, values=".format(node_id, cmd_id), values)
             except Exception as e:
-                print('CANUartServer data_received exception',data.decode(), e)
+                print('CANUartServer data_received exception', data.decode(), e)
                 self.buffer = []
 
     def process_user_input(self, fut):

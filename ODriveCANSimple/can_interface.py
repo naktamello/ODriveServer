@@ -76,7 +76,8 @@ class ODriveCANInterface:
         if command_tokens[1] not in self.known_commands:
             raise ODriveCANUnsupportedCommand
         cmd_def = find_command_definition_by_name(cmd_name)
-        packet = ODriveCANPacket(node_id, cmd_def.command_code)
+        is_remote = cmd_def.call_and_response
+        packet = ODriveCANPacket(node_id, cmd_def.command_code, is_remote)
         params = []
         for param_def, param_str in zip(cmd_def.param_defs, cmd_params):  # type: ODriveCANDataType.__class__, str
             p = param_def(param_str)  # type: ODriveCANDataType
@@ -101,11 +102,12 @@ class ODriveCANInterface:
 
 
 class ODriveCANPacket:
-    def __init__(self, node_id, msg_id):
+    def __init__(self, node_id, msg_id, is_remote=False):
         self.node_id = node_id
         self.msg_id = msg_id
         self.payload = [0x00] * 8
         self.msg_ptr = 0
+        self.is_remote = is_remote
 
     def add_payload(self, data: ODriveCANDataType):
         self.check_payload_size()
@@ -156,6 +158,9 @@ def encode_sCAN(pkt: ODriveCANPacket):
     dlc = '8'
     data = "".join([as_ascii(byte) for byte in pkt.payload])
     cr = '\r'
+    if pkt.is_remote:
+        frame_id = 'T'
+        return frame_id + can_id_ascii + dlc + cr
     return frame_id + can_id_ascii + dlc + data + cr
 
 

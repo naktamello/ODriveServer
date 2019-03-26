@@ -58,8 +58,9 @@ class Joint:
         self.output_angle_initial = None
         self.output_angle = None
         self._cpr = None
-        self.initial_cpr = None
-        self.shadow_count = None
+        self.cpr_initial = None
+        self._shadow_count = None
+        self.shadow_count_initial = None
 
     def reset_state(self):
         self.initialized = False
@@ -67,13 +68,10 @@ class Joint:
         self.offset = SetpointActual(None, None)
         self.requested_state = SetpointActual(None, None)
         self.encoder_is_ready = SetpointActual(None, None)
-        self.error = None
-        self.motor_angle = None
-        self.output_angle_initial = None
-        self.output_angle = None
         self._cpr = None
-        self.initial_cpr = None
-        self.shadow_count = None
+        self.cpr_initial = None
+        self._shadow_count = None
+        self.shadow_count_initial = None
 
     def calculate_offset(self, angle_override=None):
         abs_angle = self.config.absolute_angle if not angle_override else angle_override
@@ -140,8 +138,18 @@ class Joint:
     @cpr.setter
     def cpr(self, value):
         if self._cpr is None:
-            self.initial_cpr = value
+            self.cpr_initial = value
         self._cpr = value
+
+    @property
+    def shadow_count(self):
+        return self._cpr
+
+    @shadow_count.setter
+    def shadow_count(self, value):
+        if self._shadow_count is None:
+            self.shadow_count_initial = value
+        self._shadow_count = value
 
     @property
     def current_joint_position(self):

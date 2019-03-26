@@ -178,52 +178,53 @@ def initialize_joints(skip=None):
     # read serial, block until all expected info has been obtained
     # loop through each joint and call initialize()
 
+if __name__ == '__main__':
 
-# odrv12 = ODrive(name=odrive_config['odrv12']['name'], serial_number=odrive_config['odrv12']['serial_number'])
-# joint1 = Joint(1, odrv12)
+    # odrv12 = ODrive(name=odrive_config['odrv12']['name'], serial_number=odrive_config['odrv12']['serial_number'])
+    # joint1 = Joint(1, odrv12)
 
-# initialize_odrives()
-skip = ['j2', 'j3', 'j4', 'j5', 'j6']
+    # initialize_odrives()
+    skip = ['j2', 'j3', 'j4', 'j5', 'j6']
 
-can_bus = CanBus(skip=skip)
-can_bus.populate_joint_angles()
-# j1, j2, j3, j4, j5, j6 = initialize_joints()
-j1, = initialize_joints(skip=skip)
+    can_bus = CanBus(skip=skip)
+    can_bus.populate_joint_angles()
+    # j1, j2, j3, j4, j5, j6 = initialize_joints()
+    j1, = initialize_joints(skip=skip)
 
-# for joint_name in can_bus.joint_names:
-#     globals()[joint_name].initialize(can_bus.get_motor_absolute_position(joint_name))
-#
-# def energize_all():
-#     for joint_name in can_bus.joint_names:
-#         globals()[joint_name].energize()
-#
-# def deenergize_all():
-#     for joint_name in can_bus.joint_names:
-#         globals()[joint_name].deenergize()
-#
-# def move_p1():
-#     j1.move_to(20000)
-#     j2.move_to(15000)
-#     j3.move_to(-30000)
-#     j4.move_to(10000)
-#     j5.move_to(-20000)
-#     j6.move_to(50000)
-#
-# def move_p0():
-#     j1.move_to(0)
-#     j2.move_to(0)
-#     j3.move_to(0)
-#     j4.move_to(0)
-#     j5.move_to(0)
-#     j6.move_to(0)
+    # for joint_name in can_bus.joint_names:
+    #     globals()[joint_name].initialize(can_bus.get_motor_absolute_position(joint_name))
+    #
+    # def energize_all():
+    #     for joint_name in can_bus.joint_names:
+    #         globals()[joint_name].energize()
+    #
+    # def deenergize_all():
+    #     for joint_name in can_bus.joint_names:
+    #         globals()[joint_name].deenergize()
+    #
+    # def move_p1():
+    #     j1.move_to(20000)
+    #     j2.move_to(15000)
+    #     j3.move_to(-30000)
+    #     j4.move_to(10000)
+    #     j5.move_to(-20000)
+    #     j6.move_to(50000)
+    #
+    # def move_p0():
+    #     j1.move_to(0)
+    #     j2.move_to(0)
+    #     j3.move_to(0)
+    #     j4.move_to(0)
+    #     j5.move_to(0)
+    #     j6.move_to(0)
 
-# print(j1, j2, j3, j4, j5, j6)
-# angle = offset_angle(can_bus.joint_values['j4']['amt'], OFFSET)
+    # print(j1, j2, j3, j4, j5, j6)
+    # angle = offset_angle(can_bus.joint_values['j4']['amt'], OFFSET)
 
-# if __name__ == '__main__':
-#     print(angle)
-# print("connecting to odrive...")
-# odrv0 = odrive.find_any()
-# print("connected")
-# odrv0.axis1.encoder.config.offset = angle
-# odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    # if __name__ == '__main__':
+    #     print(angle)
+    # print("connecting to odrive...")
+    # odrv0 = odrive.find_any()
+    # print("connected")
+    # odrv0.axis1.encoder.config.offset = angle
+    # odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
