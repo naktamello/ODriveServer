@@ -15,8 +15,6 @@ cmd_queue = asyncio.Queue(maxsize=32)
 tcp_queue = asyncio.Queue(maxsize=32)
 rsp_queue = asyncio.Queue(maxsize=32)
 
-critical = []  # TODO timeout invalidation
-
 
 @dataclass
 class ResponseFilter:
@@ -46,7 +44,6 @@ class InitializeJoint:
         self.steps = 2  # TODO count method names starting with step by introspection
 
     async def step0(self, *args):
-        critical.append(True)
         self.joint.reset_state()
         if self.joint.error > 0:
             await tcp_queue.put(f"{self.joint.verbose_name} has error")
@@ -65,8 +62,6 @@ class InitializeJoint:
         can_node_id = self.joint.config.can_node_id
         can_response, *_ = args
         print('on step 1', can_response)
-        if len(critical):
-            critical.pop()
 
     async def __call__(self, can_response=None):
         method = getattr(self, f"step{self.step_idx}")
@@ -114,26 +109,31 @@ class RobotAPI:
     async def home(self, *args):
         joint_name, = args
         joint = robotic_arm.joint(joint_name)
-        homed = True
         if joint.no_encoder:
             increment = 1000
             target = joint.shadow_count
-            while not joint.get_homing_state():
+            while True:
+                if joint.get_homing_state():
+                    homed = True
+                    break
                 target = target + increment
-                await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
+                await self._set_position(joint.config.can_node_id, target)
                 await asyncio.sleep(0.2)
         else:
-            increment = int(2*joint.config.gear_ratio)
+            increment = int(2 * joint.config.gear_ratio)
             target = joint.shadow_count
             direction_t0 = joint.get_homing_direction()
-            while not joint.get_homing_state():
+            while True:
                 direction_now = joint.get_homing_direction()
+                if joint.get_homing_state():
+                    homed = True
+                    break
                 if direction_t0 != direction_now:
                     homed = False
                     print("past home")
                     break
-                target = target + direction_t0*increment
-                await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
+                target = target + direction_t0 * increment
+                await self._set_position(joint.config.can_node_id, target)
                 await asyncio.sleep(0.2)
         if homed:
             print("homed")
@@ -142,6 +142,7 @@ class RobotAPI:
 
     async def _set_position(self, node_id, position):
         await cmd_queue.put(f"{node_id} setpos {position}")
+
 
 robot_api = RobotAPI()
 
@@ -175,21 +176,16 @@ def process_stdin_data(queue):
 async def periodic_polling():
     await asyncio.sleep(1)
     while True:
-        if len(critical) > 0:
-            await asyncio.sleep(0.5)
-        else:
-            for joint in robotic_arm.joints:
-                if len(critical) > 0:
-                    continue
-                command = "{} heartbeat".format(joint.config.can_node_id)
-                await asyncio.ensure_future(cmd_queue.put(command))
-                await asyncio.sleep(0.1)
-                command = "{} encoder".format(joint.config.can_node_id)
-                await asyncio.ensure_future(cmd_queue.put(command))
-                await asyncio.sleep(0.1)
+        for joint in robotic_arm.joints:
+            command = "{} heartbeat".format(joint.config.can_node_id)
+            await asyncio.ensure_future(cmd_queue.put(command))
+            await asyncio.sleep(0.1)
+            command = "{} encoder".format(joint.config.can_node_id)
+            await asyncio.ensure_future(cmd_queue.put(command))
+            await asyncio.sleep(0.1)
 
 
-def check_response_filter(response: CANResponse):
+def find_response_filter(response: CANResponse):
     needle = f"{response.node_id}:{response.cmd_id}"
     haystack = [f"{f.node_id}:{f.cmd_id}" for f in response_filters]
     if needle not in haystack:
@@ -201,7 +197,7 @@ def check_response_filter(response: CANResponse):
 async def process_response():
     while True:
         response = await asyncio.ensure_future(rsp_queue.get())  # type: CANResponse
-        match = check_response_filter(response)
+        match = find_response_filter(response)
         if match:
             await match.callback(response)
         elif response.cmd_id in response_processors:
@@ -212,6 +208,7 @@ async def process_response():
 class IOServer(asyncio.Protocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.transport = None
         self.fut = None
 
     def connection_made(self, transport: asyncio.transports.Transport):
@@ -235,8 +232,6 @@ class IOServer(asyncio.Protocol):
             self.handle_remote_request(message)
         except Exception:
             pass
-        # fut = asyncio.ensure_future(q.get())
-        # fut.add_done_callback(self.write_reply)
 
     def handle_remote_request(self, message: str):
         # TODO client needs to send a request ID so response can be matched
@@ -265,6 +260,7 @@ class IOServer(asyncio.Protocol):
 class EncoderUartServer(asyncio.Protocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.transport = None
         self.buffer = []
 
     def connection_made(self, transport: serial_asyncio.SerialTransport):
@@ -285,20 +281,20 @@ class EncoderUartServer(asyncio.Protocol):
         elif '\n' in contents:
             to_process, rest = contents.split("\n")
             self.buffer = [rest] if rest != "" else []
-            name, angle1, angle2 = self.parse_message(to_process)
-            self.buffer = []
-            if not name:
+            name, motor_angle, output_angle = self.parse_message(to_process)
+            if name is None:
                 return
+            self.buffer = []
             joint = robotic_arm.joint(name)
-            joint.motor_angle = angle1
-            joint.output_angle = angle2
+            joint.motor_angle = motor_angle
+            joint.output_angle = output_angle
 
     @staticmethod
     def parse_message(msg) -> Union[Tuple[str, int, int], Tuple[None, None, None]]:
         try:
             name, angles = msg.strip().split(":")
-            angle1, angle2 = angles.split("/")
-            return name, int(angle1), int(angle2)
+            motor_angle, output_angle = angles.split("/")
+            return name, int(motor_angle), int(output_angle)
         except Exception:
             return None, None, None
 
@@ -306,8 +302,10 @@ class EncoderUartServer(asyncio.Protocol):
 class CANUartServer(asyncio.Protocol):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.transport = None
         self.buffer = []
         self.interface = ODriveCANInterface()
+        self.skip_print = [enums.MSG_ODRIVE_HEARTBEAT, enums.MSG_GET_ENCODER_COUNT]
 
     def connection_made(self, transport: serial_asyncio.SerialTransport):
         self.transport = transport
@@ -332,7 +330,7 @@ class CANUartServer(asyncio.Protocol):
                 self.buffer = [rest] if rest != "" else []
                 node_id, cmd_id, values = self.interface.process_response(to_process)
                 asyncio.ensure_future(rsp_queue.put(CANResponse(node_id, cmd_id, values)))
-                if cmd_id != enums.MSG_ODRIVE_HEARTBEAT and cmd_id != enums.MSG_GET_ENCODER_COUNT:
+                if cmd_id not in self.skip_print:
                     asyncio.ensure_future(tcp_queue.put(str(values) + "\n"))
                     print("CANUartServer raw:", to_process)
                     print("parsed: node={}, cmd_id={}, values=".format(node_id, cmd_id), values)
@@ -341,25 +339,20 @@ class CANUartServer(asyncio.Protocol):
                 self.buffer = []
 
     def process_user_input(self, fut):
+        skip_print = ['heartbeat', 'encoder']
         command_raw = fut.result().strip('\n')
         tokens = command_raw.split(' ')
-        if tokens[-1] not in ['heartbeat', 'encoder']:
+        if tokens[-1] not in skip_print:
             print('Received: {!r}'.format(command_raw))
         try:
             packet_ascii = self.interface.process_command(tokens)
-            if tokens[-1] not in ['heartbeat', 'encoder']:
+            if tokens[-1] not in skip_print:
                 print('Sending: {!r}'.format(packet_ascii))
             self.transport.write(packet_ascii.encode())
         except Exception:
             print("INVALID")
         fut = asyncio.ensure_future(cmd_queue.get())
         fut.add_done_callback(self.process_user_input)
-
-
-async def divine_intervention():
-    await asyncio.sleep(5)
-    # robot_command = InitializeJoint(robotic_arm.joint('j3'))
-    # robot_command()
 
 
 if __name__ == '__main__':
@@ -373,8 +366,7 @@ if __name__ == '__main__':
     server = loop.run_until_complete(coroutine2)
     coroutine3 = loop.create_task(periodic_polling())
     coroutine4 = loop.create_task(process_response())
-    coroutine5 = loop.create_task(divine_intervention())
-    loop.run_until_complete(asyncio.gather(coroutine3, coroutine4, coroutine5))
+    loop.run_until_complete(asyncio.gather(coroutine3, coroutine4))
     try:
         loop.run_forever()
     except KeyboardInterrupt:
