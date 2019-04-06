@@ -78,6 +78,15 @@ def move_p0():
     send(template.format(5, 0))
     send(template.format(6, 0))
 
+def move_p4():
+    template = "can:{} setpos {}"
+    send(template.format(1, -10000))
+    send(template.format(2, -10000))
+    send(template.format(3, -10000))
+    send(template.format(4, 10000))
+    send(template.format(5, 10000))
+    send(template.format(6, 10000))
+
 def move():
     move_p1()
     sleep(0.6)
@@ -86,6 +95,13 @@ def move():
     move_p2()
     sleep(0.6)
     move_p0()
+
+def infinite_loop():
+    while True:
+        move_p4()
+        sleep(0.6)
+        move_p0()
+        sleep(0.6)
 
 # def move_p1():
 #     j1.move_to(20000)

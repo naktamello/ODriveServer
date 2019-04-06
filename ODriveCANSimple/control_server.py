@@ -106,6 +106,12 @@ class RobotAPI:
         target = joint.get_target_position(int(angle))
         await asyncio.ensure_future(tcp_queue.put(str(target) + "\n"))
 
+    async def goto(self, *args):
+        joint_name, angle = args
+        joint = robotic_arm.joint(joint_name)
+        target = int(joint.get_target_position(int(angle)))
+        await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
+
 
 robot_api = RobotAPI()
 
