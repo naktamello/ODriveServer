@@ -19,7 +19,7 @@ joints:
       - "odrv12"
       - "axis0"
     direction: 1
-    joint_zero: 3518
+    joint_zero: 3499
     joint_limits:
       - -700
       - 900
@@ -33,7 +33,7 @@ joints:
       - "odrv34"
       - "axis0"
     direction: -1
-    joint_zero: 706
+    joint_zero: 743
     joint_limits:
       - -900
       - 550
@@ -47,7 +47,7 @@ joints:
       - "odrv34"
       - "axis1"
     direction: 1
-    joint_zero: 121
+    joint_zero: 117
     joint_limits:
       - -700
       - 700

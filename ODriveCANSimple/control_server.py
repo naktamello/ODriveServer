@@ -2,12 +2,11 @@ from asyncio import Future
 from dataclasses import dataclass
 from typing import Optional, Tuple, Union, List
 import sys
+import traceback
 import ODriveCANSimple.enums as enums
 import asyncio
 import serial_asyncio
-from time import sleep
 from ODriveCANSimple.can_interface import ODriveCANInterface
-from ODriveCANSimple.exceptions import UartServerException
 from ODriveCANSimple.helper import valid_amt_angle
 from ODriveCANSimple.robot import RoboticArm, Joint
 
@@ -87,12 +86,12 @@ class RobotAPI:
             method, *tokens = command.split(" ")
             await getattr(self, method)(*tokens)
         except Exception as e:
-            print('RobotAPI exception occured', e)
+            print('RobotAPI exception occured', traceback.format_exc())
 
     async def get_zero(self, *args):
         joint_name, = args
         joint = robotic_arm.joint(joint_name)
-        await asyncio.ensure_future(tcp_queue.put(str(joint.get_zero_position()) + "\n"))
+        await asyncio.ensure_future(tcp_queue.put(str(joint.zero_position_in_count) + "\n"))
 
     async def init_joint(self, *args):
         joint_name, = args
@@ -103,15 +102,46 @@ class RobotAPI:
     async def get_target(self, *args):
         joint_name, angle = args
         joint = robotic_arm.joint(joint_name)
-        target = joint.get_target_position(int(angle))
+        target = joint.convert_angle_to_count(int(angle))
         await asyncio.ensure_future(tcp_queue.put(str(target) + "\n"))
 
     async def goto(self, *args):
         joint_name, angle = args
         joint = robotic_arm.joint(joint_name)
-        target = int(joint.get_target_position(int(angle)))
+        target = int(joint.convert_angle_to_count(int(angle)))
         await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
 
+    async def home(self, *args):
+        joint_name, = args
+        joint = robotic_arm.joint(joint_name)
+        homed = True
+        if joint.no_encoder:
+            increment = 1000
+            target = joint.shadow_count
+            while not joint.get_homing_state():
+                target = target + increment
+                await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
+                await asyncio.sleep(0.2)
+        else:
+            increment = int(2*joint.config.gear_ratio)
+            target = joint.shadow_count
+            direction_t0 = joint.get_homing_direction()
+            while not joint.get_homing_state():
+                direction_now = joint.get_homing_direction()
+                if direction_t0 != direction_now:
+                    homed = False
+                    print("past home")
+                    break
+                target = target + direction_t0*increment
+                await cmd_queue.put(f"{joint.config.can_node_id} setpos {target}")
+                await asyncio.sleep(0.2)
+        if homed:
+            print("homed")
+            joint.home_count = target
+            joint.homed = True
+
+    async def _set_position(self, node_id, position):
+        await cmd_queue.put(f"{node_id} setpos {position}")
 
 robot_api = RobotAPI()
 
@@ -128,7 +158,6 @@ def update_encoder_count(response: CANResponse):
     shadow, cpr = response.data
     joint.cpr = cpr
     joint.shadow_count = shadow
-    print('updated encoder count', str(joint))
 
 
 def update_encoder_offset(response: CANResponse):
@@ -143,7 +172,7 @@ def process_stdin_data(queue):
     asyncio.ensure_future(queue.put(sys.stdin.readline()))
 
 
-async def get_heartbeat():
+async def periodic_polling():
     await asyncio.sleep(1)
     while True:
         if len(critical) > 0:
@@ -153,6 +182,9 @@ async def get_heartbeat():
                 if len(critical) > 0:
                     continue
                 command = "{} heartbeat".format(joint.config.can_node_id)
+                await asyncio.ensure_future(cmd_queue.put(command))
+                await asyncio.sleep(0.1)
+                command = "{} encoder".format(joint.config.can_node_id)
                 await asyncio.ensure_future(cmd_queue.put(command))
                 await asyncio.sleep(0.1)
 
@@ -300,7 +332,7 @@ class CANUartServer(asyncio.Protocol):
                 self.buffer = [rest] if rest != "" else []
                 node_id, cmd_id, values = self.interface.process_response(to_process)
                 asyncio.ensure_future(rsp_queue.put(CANResponse(node_id, cmd_id, values)))
-                if cmd_id != enums.MSG_ODRIVE_HEARTBEAT:
+                if cmd_id != enums.MSG_ODRIVE_HEARTBEAT and cmd_id != enums.MSG_GET_ENCODER_COUNT:
                     asyncio.ensure_future(tcp_queue.put(str(values) + "\n"))
                     print("CANUartServer raw:", to_process)
                     print("parsed: node={}, cmd_id={}, values=".format(node_id, cmd_id), values)
@@ -311,11 +343,11 @@ class CANUartServer(asyncio.Protocol):
     def process_user_input(self, fut):
         command_raw = fut.result().strip('\n')
         tokens = command_raw.split(' ')
-        if tokens[-1] != 'heartbeat':
+        if tokens[-1] not in ['heartbeat', 'encoder']:
             print('Received: {!r}'.format(command_raw))
         try:
             packet_ascii = self.interface.process_command(tokens)
-            if tokens[-1] != 'heartbeat':
+            if tokens[-1] not in ['heartbeat', 'encoder']:
                 print('Sending: {!r}'.format(packet_ascii))
             self.transport.write(packet_ascii.encode())
         except Exception:
@@ -339,7 +371,7 @@ if __name__ == '__main__':
     loop.run_until_complete(coroutine1)
     coroutine2 = loop.create_server(IOServer, '127.0.0.1', 1978)
     server = loop.run_until_complete(coroutine2)
-    coroutine3 = loop.create_task(get_heartbeat())
+    coroutine3 = loop.create_task(periodic_polling())
     coroutine4 = loop.create_task(process_response())
     coroutine5 = loop.create_task(divine_intervention())
     loop.run_until_complete(asyncio.gather(coroutine3, coroutine4, coroutine5))

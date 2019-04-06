@@ -1,4 +1,3 @@
-import struct
 from collections import namedtuple
 from typing import List, Tuple
 
@@ -65,6 +64,8 @@ MethodValuePair = namedtuple('MethodValuePair', ['method', 'value'])
 
 class ODriveCANInterface:
     def __init__(self):
+        self.encoder = encode_sCAN
+        self.decoder = decode_sCAN
         self.known_commands = [cmd_def.name for cmd_def in SUPPORTED_COMMANDS]
 
     def process_command(self, command_tokens):
@@ -84,10 +85,10 @@ class ODriveCANInterface:
             params.append(p)
         for param in params:
             packet.add_payload(param)
-        return encode_sCAN(packet)
+        return self.encoder(packet)
 
     def process_response(self, response_string)-> Tuple[int, int, List[any]]:
-        node_id, cmd_code, payload = decode_sCAN(response_string)
+        node_id, cmd_code, payload = self.decoder(response_string)
         cmd_def = find_command_definition_by_code(cmd_code)  # type: ODriveCANCommand
         assert cmd_def.call_and_response
         return node_id, cmd_code, self.parse_response(cmd_def, payload)

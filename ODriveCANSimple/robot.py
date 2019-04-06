@@ -1,19 +1,20 @@
 from operator import attrgetter
-from time import sleep
-from typing import Tuple, List
+from typing import List
 import os
-import odrive.enums as ODRV
 import yaml
 from dataclasses import dataclass
 
 from dacite import from_dict
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
+ANGLE_TOLERANCE = 10
+
 
 @dataclass
 class SetpointActual:
     setpoint: any
     actual: any
+
 
 @dataclass
 class JointDef:
@@ -42,14 +43,12 @@ def offset_angle(raw_angle, absolute_angle):
 
 
 class Joint:
-    cf = 4096.0/3600.0
+    cf = 4096.0 / 3600.0
 
     def __init__(self, joint_def: JointDef):
         self.joint_name = joint_def.name  # type: str
         self.joint_number = int(self.joint_name)
         self.config = joint_def
-        self.initialized = False
-        self.energized = False
         self.offset = SetpointActual(None, None)
         self.requested_state = SetpointActual(None, None)
         self.encoder_is_ready = SetpointActual(None, None)
@@ -61,10 +60,10 @@ class Joint:
         self.cpr_initial = None
         self._shadow_count = None
         self.shadow_count_initial = None
+        self.homed = False
+        self.home_count = None
 
     def reset_state(self):
-        self.initialized = False
-        self.energized = False
         self.offset = SetpointActual(None, None)
         self.requested_state = SetpointActual(None, None)
         self.encoder_is_ready = SetpointActual(None, None)
@@ -77,59 +76,48 @@ class Joint:
         abs_angle = self.config.absolute_angle if not angle_override else angle_override
         self.offset.setpoint = offset_angle(self.motor_angle, abs_angle)
         self.output_angle_initial = self.output_angle
-        # set offset angle, check written offset angle
-        # read current cpr and save
-        # self.initialized = True
 
     def calculate_limits(self):
-        initial = self.get_absolute_position(self.output_angle_initial)
+        initial = self.convert_to_joint_position(self.output_angle_initial)
         neg_limit = self.config.joint_limits[0] - initial
         pos_limit = self.config.joint_limits[1] - initial
-        return neg_limit*self.multiplier, pos_limit*self.multiplier
+        return neg_limit * self.multiplier, pos_limit * self.multiplier
 
-    def get_zero_position(self):
-        initial = self.get_absolute_position(self.output_angle_initial)
-        if self.config.has_output_encoder == 0:
-            return 0
-        return -initial*self.multiplier
+    def convert_angle_to_count(self, target_angle):
+        zero = self.zero_position_in_count
+        return zero + target_angle * self.multiplier
 
-    def get_target_position(self, target_angle):
-        zero = self.get_zero_position()
-        return zero + target_angle*self.multiplier
+    def get_homing_direction(self):
+        return self.config.direction if self.current_joint_position < 0 else -self.config.direction
 
-    def energize(self):
-        if self.initialized:
-            # request state
-            error = None  # check for error and state (heartbeat)
-            if not error:
-                self.energized = True
-        # enter closed loop control
+    def get_homing_state(self):
+        if self.no_encoder:
+            return bool(self.output_angle)
+        return abs(self.config.joint_zero - self.output_angle) < ANGLE_TOLERANCE
 
-    def deenergize(self):
-        self.energized = False
-        # enter idle state
-
-    def move_to(self, pos):
-        # TODO check axis state is in closed loop control, no error
-        if self.initialized and self.energized:
-            pass
+    def convert_to_joint_position(self, angle):
+        zero = self.config.joint_zero
+        if angle >= zero:
+            abs_angle = angle - zero
+        else:
+            abs_angle = 3599 - (zero - angle)
+        if abs_angle < 1800:
+            return abs_angle
+        return abs_angle - 3599
 
     @property
     def multiplier(self):
-        return self.config.gear_ratio*self.cf*self.config.direction
-
-    @property
-    def verbose_name(self):
-        return 'j' + self.joint_name
-
-    def __repr__(self):
-        return "Joint{}".format(self.joint_number)
+        return self.config.gear_ratio * self.cf * self.config.direction
 
     @property
     def output_angle_valid(self):
-        if self.config.has_output_encoder == 0:
+        if self.no_encoder:
             return True
         return 3600 > self.output_angle > -1
+
+    @property
+    def no_encoder(self):
+        return self.config.has_output_encoder == 0
 
     @property
     def cpr(self):
@@ -143,7 +131,7 @@ class Joint:
 
     @property
     def shadow_count(self):
-        return self._cpr
+        return self._shadow_count
 
     @shadow_count.setter
     def shadow_count(self, value):
@@ -152,18 +140,25 @@ class Joint:
         self._shadow_count = value
 
     @property
-    def current_joint_position(self):
-        return self.get_absolute_position(self.output_angle)
+    def zero_position_in_count(self):
+        if self.home_count:
+            return self.home_count
+        initial = self.convert_to_joint_position(self.output_angle_initial)
+        if self.no_encoder:
+            return 0
+        return -initial * self.multiplier
 
-    def get_absolute_position(self, angle):
-        zero = self.config.joint_zero
-        if angle >= zero:
-            abs_angle = angle - zero
-        else:
-            abs_angle = 3599 - (zero - angle)
-        if abs_angle < 1800:
-            return abs_angle
-        return abs_angle - 3599
+    @property
+    def current_joint_position(self):
+        return self.convert_to_joint_position(self.output_angle)
+
+    @property
+    def verbose_name(self):
+        return 'j' + self.joint_name
+
+    def __repr__(self):
+        return "Joint{}".format(self.joint_number)
+
 
 class RoboticArm:
     def __init__(self):
@@ -192,7 +187,6 @@ class RoboticArm:
         joints = sorted(joints, key=attrgetter('joint_number'))
 
         return tuple(joints)
-
 
 
 if __name__ == '__main__':
